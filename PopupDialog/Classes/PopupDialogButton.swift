@@ -42,6 +42,9 @@ open class PopupDialogButton: UIButton {
     /// The height of the button
     open dynamic var buttonHeight: Int
     
+    /// The btn axis
+    open dynamic var buttonAxis: UILayoutConstraintAxis
+    
     /// The title color of the button
     open dynamic var titleColor: UIColor? {
         get { return self.titleColor(for: UIControlState()) }
@@ -111,13 +114,17 @@ open class PopupDialogButton: UIButton {
      */
     public init(title: String,
                 height: Int = 45,
-                dismissOnTap: Bool = true, action: PopupDialogButtonAction?) {
+                dismissOnTap: Bool = true,
+                axis: UILayoutConstraintAxis,
+                action: PopupDialogButtonAction?) {
 
         // Assign the button height
         buttonHeight = height
         
         // Assign the button action
         buttonAction = action
+        
+        buttonAxis = axis
 
         super.init(frame: .zero)
 
@@ -158,6 +165,22 @@ open class PopupDialogButton: UIButton {
         constraints += NSLayoutConstraint.constraints(withVisualFormat: "H:|[leftSeparator(1)]", options: [], metrics: nil, views: views)
         constraints += NSLayoutConstraint.constraints(withVisualFormat: "V:|[leftSeparator]|", options: [], metrics: nil, views: views)
         NSLayoutConstraint.activate(constraints)
+    }
+    
+    open override func layoutSubviews() {
+        if buttonAxis == .vertical {
+            if self.frame.origin.x <= 0 {
+                var rect = self.frame
+                rect.origin.x = 20
+                rect.size.width = rect.size.width - 20 * 2
+                self.frame = rect
+                self.titleLabel?.frame = self.bounds
+                self.titleLabel?.textAlignment = .center
+            }
+        } else {
+            self.titleLabel?.frame = self.bounds
+            self.titleLabel?.textAlignment = .center
+        }
     }
 
     open override var isHighlighted: Bool {
